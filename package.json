@@ -7,5 +7,6 @@
 , "devDependencies" :
   { "mocha" : ""
   , "should" : ""
+  , "sinon" : ""
   }
 }

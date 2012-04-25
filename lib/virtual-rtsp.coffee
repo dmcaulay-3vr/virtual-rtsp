@@ -1,10 +1,8 @@
-net = require 'net'
 
 module.exports = class VirtualRtsp
-  constructor: (port, cameraAddress, cameraPort) ->
+  constructor: (net, port, cameraAddress, cameraPort) ->
     @server = net.createServer (c) =>
-      c.on 'data', (data) =>
-        @camera.write data
+      @addConnection c
     @server.listen port
 
     @camera = net.connect cameraPort, cameraAddress
@@ -12,3 +10,18 @@ module.exports = class VirtualRtsp
   close: ->
     @server.close()
     @camera.end()
+
+  addConnection: (c) ->
+    @connections ||= new Array()
+    if @connections.length is 0
+      @addAsProxy c
+    else
+      @addAsListener c
+    @connections.push c
+
+  addAsProxy: (c) ->
+    c.on 'data', (data) =>
+      @camera.write data
+
+  addAsListener: (c) -> 
+
